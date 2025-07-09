@@ -1,0 +1,80 @@
+@startuml
+!theme plain
+
+actor User
+participant "Web/UI" as WebUI
+
+box "Backend"
+  participant "External API" as ExtAPI
+  participant "Service Manager" as SM
+  participant "Deliverability Trust" as DT
+  participant "Messaging Service" as MS
+  participant "Deliverability Trust Phones" as DTP
+  participant "Report Generation Service" as RGS
+  participant "Authentication Service" as AuthS
+end box
+
+box "Database"
+  database "deliverability_test" as DB_test
+  database "deliverability_test_logs" as DB_logs
+  database "deliverability_test_phones" as DB_phones
+  database "deliverability_test_users" as DB_users
+end box
+
+box "Aggregator API"
+    participant "Bandwidth API" as BW_API
+end box
+
+
+User -> WebUI: Select Partner or Client -> To test numbers
+WebUI -> ExtAPI: /checktest.config?partner_id={partner_id}&client_id={client_id}
+ExtAPI -> SM: /checktest.config?partner_id={partner_id}&client_id={client_id}
+
+activate SM
+
+SM -> DT: createOrGet(partner_id, client_id, numbers)
+activate DT
+
+DT -> DB_test: SELECT user_id FROM partner_client_mapping WHERE partner_id = ? OR client_id = ?
+DB_test --> DT: user_id
+DT -> DT: **Partner or Client Selection**
+note right of DT: Get FROM Numbers
+DT -> DTP: SELECT office_phone_number, client_id FROM phone_numbers WHERE client_id IN (...)
+activate DTP
+DTP --> DT: office_phone_numbers
+deactivate DTP
+
+DT -> MS: Expand to message body
+activate MS
+MS -> DT: alert(carrier, office_phone_number, message body)
+deactivate MS
+
+DT -> DT: **Message Body Creation**
+DT -> RGS: Create entry in test
+activate RGS
+
+alt Test has a recurrence rule
+    RGS -> BW_API: Beyond incoming reply to test not in instance
+else
+    loop for each occurrence (e.g. daily for next 7 days)
+        RGS -> DB_logs: Insert batch log entry
+        RGS -> DB_test: Insert test run log entry
+        RGS -> BW_API: Insert entry
+    end
+end
+
+deactivate RGS
+deactivate DT
+deactivate SM
+
+
+alt Every day at 00:00:00 UTC
+    SM -> BW_API: executeNextTest(...)
+end
+
+alt on a defined time
+    SM -> BW_API: executeNextTest(...)
+end
+
+
+@enduml

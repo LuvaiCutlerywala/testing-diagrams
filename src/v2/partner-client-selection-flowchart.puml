@@ -1,0 +1,29 @@
+@startuml
+start
+:User selects a partner;
+if (Has user selected a client?) then (yes)
+    if (Has user selected an office?) then (yes)
+        :Select only the phone number
+        as the sender phone number;
+    else (no)
+        :Select all offices under client
+        as the sender phone numbers;
+    endif
+else (no)
+    :Select all clients under the partner,
+    and all offices under those clients, as
+    the sender phone numbers;
+endif
+:User selects the receiver phone numbers;
+:The total messages sent are:
+(the offices selected) x (the targets selected);
+note left
+    Each office selected corresponds
+    to a single sender phone number.
+
+    Each target selected corresponds
+    to a single receiver phone
+    number.
+end note
+stop
+@enduml

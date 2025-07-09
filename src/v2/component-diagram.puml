@@ -1,0 +1,66 @@
+@startuml
+
+actor User as user
+
+package UI {
+    component "Web UI" as web_ui
+    component "Mobile App" as mobile_app
+}
+
+node "Application Server" {
+    package "Service Manager" {
+        interface "SM API" as sm_api
+        component "Service Manager" as service_manager
+    }
+    package "Schedulers" {
+        component "Test Execution Scheduler" as te_scheduler
+        component "Send Message Scheduler" as sm_scheduler
+    }
+
+    component "Deliverability Test Log Service" as dtl_service
+    component "Deliverability Test Service" as dt_service
+    component "Authentication Service" as auth_service
+    component "UI Renderer Service" as renderer_service
+    component "Report Generation Service" as report_generator
+    component "Messaging Service" as messenger
+}
+
+database "Database" {
+    database "deliverability_test_logs" as dtl_table
+    database "deliverability_tests" as dt_table
+    database "deliverability_test_phones" as dtp_table
+    database "deliverability_test_users" as users_table
+    database "Textellent DB" as textellent_table
+}
+
+cloud Aggregator {
+    interface "Bandwidth API" as bandwidth
+}
+
+user -- web_ui
+user -- mobile_app
+web_ui -- sm_api
+mobile_app -- sm_api
+
+
+sm_api -- service_manager
+dtl_service -- service_manager
+dt_service -- service_manager
+auth_service -- service_manager
+report_generator -- service_manager
+messenger -- service_manager
+renderer_service -- service_manager
+te_scheduler -- dtl_service
+sm_scheduler -- dtl_service
+sm_scheduler -- messenger
+sm_scheduler -- dt_service
+
+
+dtl_service -- dtl_table
+auth_service -- users_table
+renderer_service -- dtp_table
+dt_service -- dt_table
+renderer_service -- textellent_table
+
+messenger -- bandwidth
+@enduml
