@@ -38,7 +38,9 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "luvai-development",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/luvai/IdeaProjects/textellent-deliverability-testing",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -115,6 +117,7 @@
       <workItem from="1752082947814" duration="8000" />
       <workItem from="1752082957673" duration="7000" />
       <workItem from="1752082971476" duration="36000" />
+      <workItem from="1752083022462" duration="143000" />
     </task>
     <task id="LOCAL-00001" summary="First Commit.">
       <option name="closed" value="true" />
